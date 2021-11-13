@@ -15,7 +15,7 @@ export const OtpForm = ({
     const { payload } = await dispatch(
       verifyCode({ verificationCode, email: userEmail })
     );
-    console.log("otp jsx", payload);
+    
     if (payload?.data?.statusCode === 1020 && isExistingUser) {
       navigate("/");
     }
@@ -25,7 +25,7 @@ export const OtpForm = ({
   };
 
   const resendTokenHandler = () => {
-    console.log("resending token");
+    
     dispatch(resendToken({ email: userEmail, token: JSON.stringify(token) }));
   };
 

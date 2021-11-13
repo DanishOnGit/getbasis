@@ -8,7 +8,7 @@ export const requestVerificationMail = createAsyncThunk(
   "authentication/requestVerificationMail",
   async (userEmail, { rejectWithValue }) => {
     try {
-      console.log("thunk running..");
+     
       const res = await axios({
         method: "POST",
         url: `${API_URL}/users/email`,
@@ -19,7 +19,7 @@ export const requestVerificationMail = createAsyncThunk(
           "Content-type": "application/json",
         },
       });
-      console.log("requestVerificationMail thunk running...", res.data);
+     
       return res.data;
     } catch (error) {
       console.log(error);
@@ -34,7 +34,7 @@ export const verifyCode = createAsyncThunk(
     try {
       const { email, verificationCode } = verificationDetails;
       const { auth } = getState();
-      console.log(auth);
+      
       const res = await axios({
         method: "PUT",
         url: `${API_URL}/users/email/verify`,
@@ -65,7 +65,7 @@ export const resendToken = createAsyncThunk(
           token: resendTokenDetails.token,
         },
       });
-      console.log("resend token", data);
+      
       return data;
     } catch (error) {
       console.log(error);
@@ -85,7 +85,7 @@ export const logoutUser = createAsyncThunk(
           Authorization: `Bearer ${logoutData.id},${logoutData.token}`,
         },
       });
-      console.log("logout thunk", res.data);
+     
       return res.data;
     } catch (error) {
       console.log(error);
@@ -122,7 +122,7 @@ export const checkReferralCode = createAsyncThunk(
         method: "GET",
         url: `${API_URL}/users/referral/${referralCode}`,
       });
-      console.log("is referaal code valid", data);
+      
       return data;
     } catch (error) {
       console.log(error);
@@ -153,13 +153,13 @@ export const authenticationSlice = createSlice({
     },
     [requestVerificationMail.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      console.log("payload", payload);
+      
       state.token = payload.results.token;
       state.isExistingUser = payload.results.isLogin;
     },
     [requestVerificationMail.rejected]: (state, { payload }) => {
       state.status = "error";
-      console.log("rejected", payload);
+     
       notify({ message: payload.message, type: "error" });
     },
 
@@ -168,7 +168,7 @@ export const authenticationSlice = createSlice({
     },
     [verifyCode.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      console.log("verofy code fulilled", payload);
+     
       if (payload.data.statusCode === 1020 && payload.data.results.isLogin) {
         state.userProfile = { ...payload.data.results.user };
         state.loggedInStatus = true;
@@ -188,7 +188,7 @@ export const authenticationSlice = createSlice({
           message: "Wrong token entered too many times",
           type: "error",
         });
-        console.log("Wron otp limit reached");
+        
         state.token = null;
       }
     },
@@ -216,7 +216,7 @@ export const authenticationSlice = createSlice({
     },
     [signupUser.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      console.log("signup payload", payload);
+      
       state.userProfile = { ...payload.results.user };
       state.loggedInStatus = true;
       notify({ message: "Signup successfull", type: "success" });
@@ -231,14 +231,10 @@ export const authenticationSlice = createSlice({
     },
     [checkReferralCode.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      // if (payload?.statusCode === 1100) {
-      //   console.log("valid code");
-      // } else {
-      //   console.log("invalid code");
-      // }
+     
     },
     [checkReferralCode.rejected]: (state, { payload }) => {
-      console.log("in rejectwithvalue for referallcode");
+     
       state.status = "rejected";
       notify({
         message: "Please enter valid referral code or remove it!",

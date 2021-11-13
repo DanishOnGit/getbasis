@@ -2,7 +2,7 @@ import { useAuth } from "../authentication/authenticationSlice";
 
 export const Profile = () => {
   const { userProfile } = useAuth();
-   console.log('Profile jsx',userProfile)
+
   return (
     <>
       <div>
