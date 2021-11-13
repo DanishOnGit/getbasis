@@ -111,6 +111,25 @@ export const signupUser = createAsyncThunk(
     }
   );
 
+  export const logoutUser = createAsyncThunk(
+    "authentication/logoutUser",
+    async (logoutData) => {
+      try {
+        const res = await axios({
+          method: "DELETE",
+          url: `${API_URL}/users/logout/${logoutData.id}`,
+          headers: {
+            Authorization: `Bearer ${logoutData.id},${logoutData.token}`,
+          },
+        });
+        console.log("logout thunk", res.data);
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
+
 
 export const authenticationSlice = createSlice({
   name: "authentication",
@@ -220,6 +239,16 @@ export const authenticationSlice = createSlice({
           message: "Please enter valid referral code or remove it!",
           type: "error",
         });
+      },
+      [logoutUser.pending]: (state) => {
+        state.status = "pending";
+      },
+      [logoutUser.fulfilled]: (state, { payload }) => {
+        state.status = "fulfilled";
+        if (payload.statusCode === 1015) {
+          state.loggedInStatus = false;
+          state.token = null;
+        }
       },
   },
 });
