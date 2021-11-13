@@ -8,7 +8,6 @@ export const requestVerificationMail = createAsyncThunk(
   "authentication/requestVerificationMail",
   async (userEmail, { rejectWithValue }) => {
     try {
-     
       const res = await axios({
         method: "POST",
         url: `${API_URL}/users/email`,
@@ -19,7 +18,7 @@ export const requestVerificationMail = createAsyncThunk(
           "Content-type": "application/json",
         },
       });
-     
+
       return res.data;
     } catch (error) {
       console.log(error);
@@ -34,7 +33,7 @@ export const verifyCode = createAsyncThunk(
     try {
       const { email, verificationCode } = verificationDetails;
       const { auth } = getState();
-      
+
       const res = await axios({
         method: "PUT",
         url: `${API_URL}/users/email/verify`,
@@ -65,7 +64,7 @@ export const resendToken = createAsyncThunk(
           token: resendTokenDetails.token,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.log(error);
@@ -85,7 +84,7 @@ export const logoutUser = createAsyncThunk(
           Authorization: `Bearer ${logoutData.id},${logoutData.token}`,
         },
       });
-     
+
       return res.data;
     } catch (error) {
       console.log(error);
@@ -122,7 +121,7 @@ export const checkReferralCode = createAsyncThunk(
         method: "GET",
         url: `${API_URL}/users/referral/${referralCode}`,
       });
-      
+
       return data;
     } catch (error) {
       console.log(error);
@@ -153,13 +152,17 @@ export const authenticationSlice = createSlice({
     },
     [requestVerificationMail.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      
+
       state.token = payload.results.token;
       state.isExistingUser = payload.results.isLogin;
+      notify({
+        message: "Token sent on your email sucessfully!",
+        type: "success",
+      });
     },
     [requestVerificationMail.rejected]: (state, { payload }) => {
       state.status = "error";
-     
+
       notify({ message: payload.message, type: "error" });
     },
 
@@ -168,7 +171,7 @@ export const authenticationSlice = createSlice({
     },
     [verifyCode.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-     
+
       if (payload.data.statusCode === 1020 && payload.data.results.isLogin) {
         state.userProfile = { ...payload.data.results.user };
         state.loggedInStatus = true;
@@ -177,18 +180,19 @@ export const authenticationSlice = createSlice({
       if (payload.data.statusCode === 1020 && !payload.data.results.isLogin) {
         state.email = payload.email;
       }
-      if(payload.data.statusCode===1021){
-        notify({message:'Invalid Token',type:'error'})
+      if (payload.data.statusCode === 1021) {
+        notify({ message: "Invalid Token", type: "error" });
       }
       if (
         (payload.data.statusCode === 1022 &&
-        payload.data.messageObj.wrongEmailTokenCount >= 3)||payload.data.statusCode===3003
+          payload.data.messageObj.wrongEmailTokenCount >= 3) ||
+        payload.data.statusCode === 3003
       ) {
         notify({
           message: "Wrong token entered too many times",
           type: "error",
         });
-        
+
         state.token = null;
       }
     },
@@ -204,7 +208,7 @@ export const authenticationSlice = createSlice({
       if (payload?.statusCode === 1031) {
         notify({ message: "Resend token limit reached", type: "info" });
         state.token = null;
-      }else{
+      } else {
         notify({ message: "Token resent successfully", type: "success" });
       }
     },
@@ -216,7 +220,7 @@ export const authenticationSlice = createSlice({
     },
     [signupUser.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-      
+
       state.userProfile = { ...payload.results.user };
       state.loggedInStatus = true;
       notify({ message: "Signup successfull", type: "success" });
@@ -231,10 +235,8 @@ export const authenticationSlice = createSlice({
     },
     [checkReferralCode.fulfilled]: (state, { payload }) => {
       state.status = "fulfilled";
-     
     },
     [checkReferralCode.rejected]: (state, { payload }) => {
-     
       state.status = "rejected";
       notify({
         message: "Please enter valid referral code or remove it!",
