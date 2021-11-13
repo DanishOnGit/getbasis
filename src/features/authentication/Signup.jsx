@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
+import { notify } from "../utils/toast";
 import { checkReferralCode, signupUser, useAuth } from "./authenticationSlice";
 
 export const Signup = () => {
   const [firstName, setFirstName] = useState("");
   const [referredCodeKey, setReferredCodeKey] = useState("");
+  const [agreeToPrivacyPolicy, setAgreeToPrivacyPolicy] = useState(false);
   const { token, email } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const signup = async (e) => {
     e.preventDefault();
-    if (referredCodeKey.length >= 1) {
-      const result = await dispatch(checkReferralCode(referredCodeKey));
-      if (result?.payload?.statusCode === 1100) {
+    if (agreeToPrivacyPolicy) {
+      if (referredCodeKey.length >= 1) {
+        const result = await dispatch(checkReferralCode(referredCodeKey));
+        if (result?.payload?.statusCode === 1100) {
+          dispatch(
+            signupUser({
+              firstName: firstName,
+              referredCodeKey,
+              email,
+              token: JSON.stringify(token),
+            })
+          );
+        }
+      } else {
         dispatch(
           signupUser({
             firstName: firstName,
@@ -25,14 +38,7 @@ export const Signup = () => {
         );
       }
     } else {
-      dispatch(
-        signupUser({
-          firstName: firstName,
-          referredCodeKey,
-          email,
-          token: JSON.stringify(token),
-        })
-      );
+      notify({ message: "You must agree to our privacy policy", type: "info" });
     }
   };
 
@@ -82,6 +88,13 @@ export const Signup = () => {
           />
 
           <br />
+          <input
+            id="privacy-policy"
+            type="checkbox"
+            checked={agreeToPrivacyPolicy}
+            onChange={() => setAgreeToPrivacyPolicy(!agreeToPrivacyPolicy)}
+          />
+          <label htmlFor="privacy-policy">Agree to privacy policy</label>
           <div className="text-center">
             <button className="btn" type="submit">
               Sign Up

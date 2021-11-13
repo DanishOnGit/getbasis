@@ -1,5 +1,8 @@
-# Authentication
-
+# [Basis App](https://getbasis27.netlify.app)
+## Assumptions
+* To Sign up, the user clicks Sign up button. If referral code is provided,then the code will be validated first and only then Signup API will be hit!
+* The 'source: WEB_APP' key-value pair is hard-coded during Signup
+* The 'agreeToPrivacyPolicy: true' is also hard-coded, but, I have included a checkbox for the user during signup.User must agree to privacy policy to proceed signing up!
 ## Installation
 
 Follow the steps below to setup our React+Redux project:
