@@ -94,6 +94,22 @@ export const signupUser = createAsyncThunk(
       }
     }
   );
+  export const checkReferralCode = createAsyncThunk(
+    "authentication/checkReferralCode",
+    async (referralCode, { rejectWithValue }) => {
+      try {
+        const { data } = await axios({
+          method: "GET",
+          url: `${API_URL}/users/referral/${referralCode}`,
+        });
+        console.log("is referaal code valid", data);
+        return data;
+      } catch (error) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data);
+      }
+    }
+  );
 
 
 export const authenticationSlice = createSlice({
@@ -185,6 +201,25 @@ export const authenticationSlice = createSlice({
         state.status = "rejected";
   
         notify({ message: payload?.message, type: "error" });
+      },
+      [checkReferralCode.pending]: (state) => {
+        state.status = "pending";
+      },
+      [checkReferralCode.fulfilled]: (state, { payload }) => {
+        state.status = "fulfilled";
+        // if (payload?.statusCode === 1100) {
+        //   console.log("valid code");
+        // } else {
+        //   console.log("invalid code");
+        // }
+      },
+      [checkReferralCode.rejected]: (state, { payload }) => {
+        console.log("in rejectwithvalue for referallcode");
+        state.status = "rejected";
+        notify({
+          message: "Please enter valid referral code or remove it!",
+          type: "error",
+        });
       },
   },
 });
