@@ -14,33 +14,35 @@ function App() {
     <div className="App">
       <div>
         {loggedInStatus && <Navbar />}
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                {" "}
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <PublicRoute>
-                <Signup />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+        <div className="container">
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  {" "}
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <Signup />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
       </div>
     </div>
   );
