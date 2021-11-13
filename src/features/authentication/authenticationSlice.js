@@ -74,6 +74,27 @@ export const resendToken = createAsyncThunk(
   }
 );
 
+export const signupUser = createAsyncThunk(
+    "authentication/signupUser",
+    async (signupFormData, { rejectWithValue }) => {
+      try {
+        const res = await axios({
+          method: "POST",
+          url: `${API_URL}/users`,
+          data: {
+            ...signupFormData,
+            agreeToPrivacyPolicy: true,
+            source: "WEB_APP",
+          },
+        });
+        return res.data;
+      } catch (error) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data);
+      }
+    }
+  );
+
 
 export const authenticationSlice = createSlice({
   name: "authentication",
@@ -150,6 +171,21 @@ export const authenticationSlice = createSlice({
     [resendToken.rejected]: (state, { payload }) => {
       state.status = "rejected";
     },
+    [signupUser.pending]: (state) => {
+        state.status = "pending";
+      },
+      [signupUser.fulfilled]: (state, { payload }) => {
+        state.status = "fulfilled";
+        console.log("signup payload", payload);
+        state.userProfile = { ...payload.results.user };
+        state.loggedInStatus = true;
+        notify({ message: "Signup successfull", type: "success" });
+      },
+      [signupUser.rejected]: (state, { payload }) => {
+        state.status = "rejected";
+  
+        notify({ message: payload?.message, type: "error" });
+      },
   },
 });
 
