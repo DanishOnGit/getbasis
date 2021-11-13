@@ -9,7 +9,7 @@ export const OtpForm = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isExistingUser,token } = useAuth();
+  const { isExistingUser, token } = useAuth();
 
   const verifyCodeHandler = async () => {
     const { payload } = await dispatch(
@@ -24,26 +24,33 @@ export const OtpForm = ({
     }
   };
 
-  const resendTokenHandler=()=>{
-      console.log('resending token')
-      dispatch(resendToken({email:userEmail,token:JSON.stringify(token)}))
-  }
+  const resendTokenHandler = () => {
+    console.log("resending token");
+    dispatch(resendToken({ email: userEmail, token: JSON.stringify(token) }));
+  };
 
   return (
     <>
+      <label htmlFor="tokenField">Enter Token:</label>
+      <br/>
       <input
+        id="tokenField"
         className="input"
         value={verificationCode}
         onChange={(e) => setVerificationCode(e.target.value)}
       />
-      <br />
+      <small className='block'>Token length must be 6 characters</small>
       <div className="text-center">
-        <button className="btn" onClick={verifyCodeHandler}>
+        <button
+          className="btn"
+          onClick={verifyCodeHandler}
+          disabled={verificationCode.toString().length < 6 ? true : false}
+        >
           Verify Token
         </button>
-        <br/>
-        <p className='resend-btn' onClick={resendTokenHandler}>
-            Resend Token
+        <br />
+        <p className="resend-btn" onClick={resendTokenHandler}>
+          Resend Token
         </p>
       </div>
     </>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { checkReferralCode, signupUser, useAuth } from "./authenticationSlice";
 
 export const Signup = () => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [referredCodeKey, setReferredCodeKey] = useState("");
   const { token, email } = useAuth();
   const dispatch = useDispatch();
@@ -12,13 +12,12 @@ export const Signup = () => {
 
   const signup = async (e) => {
     e.preventDefault();
-
     if (referredCodeKey.length >= 1) {
       const result = await dispatch(checkReferralCode(referredCodeKey));
       if (result?.payload?.statusCode === 1100) {
         dispatch(
           signupUser({
-            firstName: name,
+            firstName: firstName,
             referredCodeKey,
             email,
             token: JSON.stringify(token),
@@ -28,21 +27,20 @@ export const Signup = () => {
     } else {
       dispatch(
         signupUser({
-          firstName: name,
+          firstName: firstName,
           referredCodeKey,
           email,
           token: JSON.stringify(token),
         })
       );
     }
-
   };
 
   useEffect(() => {
     if (!token) {
       navigate("/login");
     }
-  }, [navigate,token]);
+  }, [navigate, token]);
   return (
     <>
       <div>
@@ -54,8 +52,8 @@ export const Signup = () => {
             required
             className="input"
             id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
           />
 
           <br />
@@ -82,10 +80,11 @@ export const Signup = () => {
               setReferredCodeKey(e.target.value);
             }}
           />
+
           <br />
           <div className="text-center">
             <button className="btn" type="submit">
-              Signup
+              Sign Up
             </button>
           </div>
         </form>

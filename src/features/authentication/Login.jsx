@@ -16,7 +16,7 @@ export const Login = () => {
     <>
       <div className="login-form">
         <h1 className="text-center">Login</h1>
-        <form onSubmit={requestToken}>
+        <form className="form" onSubmit={requestToken}>
           <label htmlFor="userEmail">Email:</label>
           <br />
           <input
@@ -37,15 +37,14 @@ export const Login = () => {
               </button>
             </div>
           )}
-
-          {token && (
-            <OtpForm
-              verificationCode={verificationCode}
-              setVerificationCode={setVerificationCode}
-              userEmail={userEmail}
-            />
-          )}
         </form>
+        {token && (
+          <OtpForm
+            verificationCode={verificationCode}
+            setVerificationCode={setVerificationCode}
+            userEmail={userEmail}
+          />
+        )}
       </div>
     </>
   );
