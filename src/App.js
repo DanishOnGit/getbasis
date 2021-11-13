@@ -8,6 +8,8 @@ import { Navbar } from "./features/navbar/Navbar";
 import { PrivateRoute } from "./features/privateRoute/PrivateRoute";
 import { Profile } from "./features/profile/Profile";
 import { PublicRoute } from "./features/publicRoute/PublicRoute";
+import { PageNotFound } from "./features/publicRoute/PageNotFound";
+
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
@@ -41,6 +43,14 @@ function App() {
                 <PrivateRoute>
                   <Profile />
                 </PrivateRoute>
+              }
+            />
+            <Route
+              path="/*"
+              element={
+                <PublicRoute>
+                  <PageNotFound/>
+                </PublicRoute>
               }
             />
           </Routes>
