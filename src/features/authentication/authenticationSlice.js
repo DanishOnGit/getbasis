@@ -8,7 +8,7 @@ export const requestVerificationMail = createAsyncThunk(
   "authentication/requestVerificationMail",
   async (userEmail, { rejectWithValue }) => {
     try {
-      const res = await axios({
+      const {data} = await axios({
         method: "POST",
         url: `${API_URL}/users/email`,
         data: {
@@ -19,7 +19,7 @@ export const requestVerificationMail = createAsyncThunk(
         },
       });
 
-      return res.data;
+      return data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error?.response?.data);
@@ -34,7 +34,7 @@ export const verifyCode = createAsyncThunk(
       const { email, verificationCode } = verificationDetails;
       const { auth } = getState();
 
-      const res = await axios({
+      const response = await axios({
         method: "PUT",
         url: `${API_URL}/users/email/verify`,
         data: {
@@ -44,7 +44,7 @@ export const verifyCode = createAsyncThunk(
         },
       });
 
-      return { data: res.data, email };
+      return { data: response.data, email };
     } catch (error) {
       console.log(error);
       return rejectWithValue(error?.response?.data);
@@ -77,7 +77,7 @@ export const logoutUser = createAsyncThunk(
   "authentication/logoutUser",
   async (logoutData) => {
     try {
-      const res = await axios({
+      const {data} = await axios({
         method: "DELETE",
         url: `${API_URL}/users/logout/${logoutData.id}`,
         headers: {
@@ -85,7 +85,7 @@ export const logoutUser = createAsyncThunk(
         },
       });
 
-      return res.data;
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -96,7 +96,7 @@ export const signupUser = createAsyncThunk(
   "authentication/signupUser",
   async (signupFormData, { rejectWithValue }) => {
     try {
-      const res = await axios({
+      const {data} = await axios({
         method: "POST",
         url: `${API_URL}/users`,
         data: {
@@ -105,7 +105,7 @@ export const signupUser = createAsyncThunk(
           source: "WEB_APP",
         },
       });
-      return res.data;
+      return data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error?.response?.data);

@@ -20,7 +20,7 @@ export const Login = () => {
   return (
     <>
       <div className="login-form">
-        <h1 className="text-center">Login</h1>
+        <h1 className="text-center">Log In</h1>
         <form className="form" onSubmit={requestToken}>
           <label htmlFor="userEmail">Email:</label>
           <br />
