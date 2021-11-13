@@ -156,7 +156,7 @@ export const authenticationSlice = createSlice({
       state.token = payload.results.token;
       state.isExistingUser = payload.results.isLogin;
       notify({
-        message: "Token sent on your email sucessfully!",
+        message: "Verification email sent sucessfully!",
         type: "success",
       });
     },
