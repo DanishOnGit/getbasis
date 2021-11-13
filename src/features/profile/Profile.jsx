@@ -6,11 +6,12 @@ export const Profile = () => {
   return (
     <>
       <div>
+        <h1>User Profile:</h1>
         <p>
-          Full name: {userProfile.firstName} {userProfile.lastName}
+          Full name: <span className='font-light'>{userProfile.firstName} {userProfile.lastName}</span> 
         </p>
-        <p>Email: {userProfile.email} </p>
-        <p>Phone: {userProfile.phoneNumber} </p>
+        <p>Email: <span  className='font-light'>{userProfile.email}</span>  </p>
+        <p>Phone: <span  className='font-light'>{userProfile.phoneNumber}</span>  </p>
       </div>
     </>
   );
