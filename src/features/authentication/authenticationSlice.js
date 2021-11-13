@@ -74,62 +74,62 @@ export const resendToken = createAsyncThunk(
   }
 );
 
+export const logoutUser = createAsyncThunk(
+  "authentication/logoutUser",
+  async (logoutData) => {
+    try {
+      const res = await axios({
+        method: "DELETE",
+        url: `${API_URL}/users/logout/${logoutData.id}`,
+        headers: {
+          Authorization: `Bearer ${logoutData.id},${logoutData.token}`,
+        },
+      });
+      console.log("logout thunk", res.data);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 export const signupUser = createAsyncThunk(
-    "authentication/signupUser",
-    async (signupFormData, { rejectWithValue }) => {
-      try {
-        const res = await axios({
-          method: "POST",
-          url: `${API_URL}/users`,
-          data: {
-            ...signupFormData,
-            agreeToPrivacyPolicy: true,
-            source: "WEB_APP",
-          },
-        });
-        return res.data;
-      } catch (error) {
-        console.log(error);
-        return rejectWithValue(error?.response?.data);
-      }
+  "authentication/signupUser",
+  async (signupFormData, { rejectWithValue }) => {
+    try {
+      const res = await axios({
+        method: "POST",
+        url: `${API_URL}/users`,
+        data: {
+          ...signupFormData,
+          agreeToPrivacyPolicy: true,
+          source: "WEB_APP",
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error?.response?.data);
     }
-  );
-  export const checkReferralCode = createAsyncThunk(
-    "authentication/checkReferralCode",
-    async (referralCode, { rejectWithValue }) => {
-      try {
-        const { data } = await axios({
-          method: "GET",
-          url: `${API_URL}/users/referral/${referralCode}`,
-        });
-        console.log("is referaal code valid", data);
-        return data;
-      } catch (error) {
-        console.log(error);
-        return rejectWithValue(error?.response?.data);
-      }
-    }
-  );
+  }
+);
 
-  export const logoutUser = createAsyncThunk(
-    "authentication/logoutUser",
-    async (logoutData) => {
-      try {
-        const res = await axios({
-          method: "DELETE",
-          url: `${API_URL}/users/logout/${logoutData.id}`,
-          headers: {
-            Authorization: `Bearer ${logoutData.id},${logoutData.token}`,
-          },
-        });
-        console.log("logout thunk", res.data);
-        return res.data;
-      } catch (error) {
-        console.log(error);
-      }
+export const checkReferralCode = createAsyncThunk(
+  "authentication/checkReferralCode",
+  async (referralCode, { rejectWithValue }) => {
+    try {
+      const { data } = await axios({
+        method: "GET",
+        url: `${API_URL}/users/referral/${referralCode}`,
+      });
+      console.log("is referaal code valid", data);
+      return data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error?.response?.data);
     }
-  );
-
+  }
+);
 
 export const authenticationSlice = createSlice({
   name: "authentication",
@@ -177,9 +177,12 @@ export const authenticationSlice = createSlice({
       if (payload.data.statusCode === 1020 && !payload.data.results.isLogin) {
         state.email = payload.email;
       }
+      if(payload.data.statusCode===1021){
+        notify({message:'Invalid Token',type:'error'})
+      }
       if (
-        payload.data.statusCode === 1022 &&
-        payload.data.messageObj.wrongEmailTokenCount >= 3
+        (payload.data.statusCode === 1022 &&
+        payload.data.messageObj.wrongEmailTokenCount >= 3)||payload.data.statusCode===3003
       ) {
         notify({
           message: "Wrong token entered too many times",
@@ -201,55 +204,57 @@ export const authenticationSlice = createSlice({
       if (payload?.statusCode === 1031) {
         notify({ message: "Resend token limit reached", type: "info" });
         state.token = null;
+      }else{
+        notify({ message: "Token resent successfully", type: "success" });
       }
     },
     [resendToken.rejected]: (state, { payload }) => {
       state.status = "rejected";
     },
     [signupUser.pending]: (state) => {
-        state.status = "pending";
-      },
-      [signupUser.fulfilled]: (state, { payload }) => {
-        state.status = "fulfilled";
-        console.log("signup payload", payload);
-        state.userProfile = { ...payload.results.user };
-        state.loggedInStatus = true;
-        notify({ message: "Signup successfull", type: "success" });
-      },
-      [signupUser.rejected]: (state, { payload }) => {
-        state.status = "rejected";
-  
-        notify({ message: payload?.message, type: "error" });
-      },
-      [checkReferralCode.pending]: (state) => {
-        state.status = "pending";
-      },
-      [checkReferralCode.fulfilled]: (state, { payload }) => {
-        state.status = "fulfilled";
-        // if (payload?.statusCode === 1100) {
-        //   console.log("valid code");
-        // } else {
-        //   console.log("invalid code");
-        // }
-      },
-      [checkReferralCode.rejected]: (state, { payload }) => {
-        console.log("in rejectwithvalue for referallcode");
-        state.status = "rejected";
-        notify({
-          message: "Please enter valid referral code or remove it!",
-          type: "error",
-        });
-      },
-      [logoutUser.pending]: (state) => {
-        state.status = "pending";
-      },
-      [logoutUser.fulfilled]: (state, { payload }) => {
-        state.status = "fulfilled";
-        if (payload.statusCode === 1015) {
-          state.loggedInStatus = false;
-          state.token = null;
-        }
-      },
+      state.status = "pending";
+    },
+    [signupUser.fulfilled]: (state, { payload }) => {
+      state.status = "fulfilled";
+      console.log("signup payload", payload);
+      state.userProfile = { ...payload.results.user };
+      state.loggedInStatus = true;
+      notify({ message: "Signup successfull", type: "success" });
+    },
+    [signupUser.rejected]: (state, { payload }) => {
+      state.status = "rejected";
+
+      notify({ message: payload?.message, type: "error" });
+    },
+    [checkReferralCode.pending]: (state) => {
+      state.status = "pending";
+    },
+    [checkReferralCode.fulfilled]: (state, { payload }) => {
+      state.status = "fulfilled";
+      // if (payload?.statusCode === 1100) {
+      //   console.log("valid code");
+      // } else {
+      //   console.log("invalid code");
+      // }
+    },
+    [checkReferralCode.rejected]: (state, { payload }) => {
+      console.log("in rejectwithvalue for referallcode");
+      state.status = "rejected";
+      notify({
+        message: "Please enter valid referral code or remove it!",
+        type: "error",
+      });
+    },
+    [logoutUser.pending]: (state) => {
+      state.status = "pending";
+    },
+    [logoutUser.fulfilled]: (state, { payload }) => {
+      state.status = "fulfilled";
+      if (payload.statusCode === 1015) {
+        state.loggedInStatus = false;
+        state.token = null;
+      }
+    },
   },
 });
 

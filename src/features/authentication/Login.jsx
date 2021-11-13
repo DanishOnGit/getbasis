@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { requestVerificationMail, useAuth } from "./authenticationSlice";
 import { OtpForm } from "./OtpForm";
@@ -12,6 +12,11 @@ export const Login = () => {
     e.preventDefault();
     dispatch(requestVerificationMail(userEmail));
   };
+  useEffect(() => {
+    if (!token) {
+      setVerificationCode("");
+    }
+  }, [token]);
   return (
     <>
       <div className="login-form">
